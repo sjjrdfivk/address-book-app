@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -16,120 +16,93 @@ import {
   useColorScheme,
   View,
   PermissionsAndroid,
+  TouchableOpacity,
+  ImageBackground,
+  Modal,
+  TextInput
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
 import Contacts from 'react-native-contacts';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
 
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
 
 function App(): JSX.Element {
+  const [modalVisible, setModalVisible] = useState(false)
+  const [value, setValue] = useState("")
+
+  const image = { uri: require("./assets/image.jpg") };
+
   useEffect(() => {
+    // PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS, {
+    //   title: 'Contacts',
+    //   message: '此应用程序希望查看您的联系人.',
+    //   buttonPositive: '请接受',
+    // }).then(() =>
+    //   Contacts.getAll()
+    //     .then(contacts => {
+    //       console.log(contacts);
+    //     })
+    //     .catch(() => {}),
+    // );
+  }, []);
+
+  const onPress = () => {
     PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS, {
       title: 'Contacts',
-      message: 'This app would like to view your contacts.',
-      buttonPositive: 'Please accept bare mortal',
+      message: '此应用程序希望查看您的联系人.',
+      buttonPositive: '请接受',
     }).then(() =>
       Contacts.getAll()
         .then(contacts => {
           console.log(contacts);
+          setModalVisible(true)
         })
         .catch(() => {}),
     );
-  }, []);
+  }
 
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+    <SafeAreaView>
+      <ImageBackground source={image} style={styles.background}>
+        <TouchableOpacity onPress={onPress} activeOpacity={1}>
+        </TouchableOpacity>
+      </ImageBackground>
+      <Modal visible={modalVisible}>
+        <TextInput
+          style={styles.textInput}
+          onChangeText={text => setValue(text)}
+          value={value}
+        />
+        <TouchableOpacity style={styles.submit}>
+          <Text style={styles.submitText}>确定</Text> 
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  background: {
+    flex: 1
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  center: {
+    flex: 1,
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  submit: {
+    width: 80,
+    height: 40,
+    backgroundColor: "#2470E2"
   },
-  highlight: {
-    fontWeight: '700',
+  submitText: {
+    color: "#fff"
   },
+  textInput: {
+    height: 40,
+    borderColor: 'gray', 
+    borderWidth: 1
+  }
 });
 
 export default App;
